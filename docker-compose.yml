@@ -1,0 +1,49 @@
+version: '3.3'
+
+services:
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    command:
+      - "--log.level=INFO"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=dan@khosa.co"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./letsencrypt:/letsencrypt"
+    restart: unless-stopped
+
+  srs:
+    image: ossrs/oryx:5.15.5
+    container_name: srs
+    ports:
+      - "2022:2022"    # HTTP server
+      - "2443:2443"    # HTTPS server
+      - "1935:1935"    # RTMP live streaming server
+      - "8000:8000/udp" # WebRTC Media server
+      - "10080:10080/udp" # Stream Converter: Push SRT Media server (optional)
+    volumes:
+      - "$HOME/data:/data" # Volume mapping
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.srs.rule=Host(`watche.stream`)"
+      - "traefik.http.routers.srs.entrypoints=web"
+      - "traefik.http.middlewares.srs-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.srs.middlewares=srs-redirect"
+      - "traefik.http.routers.srs-secure.rule=Host(`watche.stream`)"
+      - "traefik.http.routers.srs-secure.entrypoints=websecure"
+      - "traefik.http.routers.srs-secure.tls=true"
+      - "traefik.http.routers.srs-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.srs.loadbalancer.server.port=2022"
+    restart: unless-stopped
+
+volumes:
+  letsencrypt:
