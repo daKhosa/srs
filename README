@@ -1,1 +1,25 @@
-docker-compose file contains a self contained onyx instance and a traffix reverse proxy to provide quick and simple SSL with no need for configuration 
+# SRS and Traefik Docker Setup
+
+This guide provides step-by-step instructions to set up the SRS (Simple Realtime Server) and Traefik using Docker Compose.
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+## Steps
+
+### 1. Download the `docker-compose.yml` File
+
+You can use `curl` or `wget` to download the `docker-compose.yml` file from the GitHub repository.
+
+#### Using `curl`
+
+```sh
+curl -O https://raw.githubusercontent.com/daKhosa/srs/main/docker-compose.yml
+
+#### Using `wget`
+wget https://raw.githubusercontent.com/daKhosa/srs/main/docker-compose.yml
+
+#### Using `docker-compose`
+docker-compose up
