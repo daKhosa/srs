@@ -1,0 +1,1 @@
+docker-compose file contains a self contained onyx instance and a traffix reverse proxy to provide quick and simple SSL with no need for configuration 
